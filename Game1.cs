@@ -4,9 +4,9 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Horizon3
 {
-    public class Game1 : Game
+    internal class Game1 : Game
     {
-        private GraphicsDeviceManager _graphics;
+        private readonly GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
         public Game1()
@@ -18,7 +18,9 @@ namespace Horizon3
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            _graphics.PreferredBackBufferHeight = GameSettings.Height;
+            _graphics.PreferredBackBufferWidth = GameSettings.Width;
+            _graphics.ApplyChanges();
 
             base.Initialize();
         }
@@ -27,7 +29,10 @@ namespace Horizon3
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            GlobalStateContext.Add(new MainMenu(Content));
+            GlobalStateContext.Add(new GameScreen(Content));
+            GlobalStateContext.Add(new EndMenu(Content));
+            GlobalStateContext.LoadScene<MainMenu>();
         }
 
         protected override void Update(GameTime gameTime)
@@ -35,16 +40,18 @@ namespace Horizon3
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            GlobalStateContext.Update(gameTime);
 
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
-            // TODO: Add your drawing code here
+            _spriteBatch.Begin();
+            GlobalStateContext.Draw(_spriteBatch);
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }
