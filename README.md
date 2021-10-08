@@ -1,2 +1,2 @@
 # Horizon3
-Math3 game
+Match3 game
