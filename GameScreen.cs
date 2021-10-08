@@ -11,7 +11,7 @@ namespace Horizon3
 
         private GameGrid grid;
         private ScoreWidget _scoreWidget;
-        private SceneTimer _timer;
+        private GameTimer _timer;
 
         public GameScreen(ContentManager content)
         {
@@ -22,7 +22,7 @@ namespace Horizon3
         {
             grid = new GameGrid(_content);
             _scoreWidget = new ScoreWidget(_content);
-            _timer = new SceneTimer(_content, 60d);
+            _timer = new GameTimer(_content, 60d);
         }
 
         public void Stop()
