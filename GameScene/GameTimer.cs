@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Horizon3.GameScene
 {
-    internal class GameTimer : Label
+    public class GameTimer : Label
     {
         private double _timeLeft;
 

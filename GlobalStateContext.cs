@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Horizon3
 {
-    internal static class GlobalStateContext
+    public static class GlobalStateContext
     {
         public static IGlobalState CurrentScene { get; private set; }
 

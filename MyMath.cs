@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 
 namespace Horizon3
 {
-    internal static class MyMath
+    public static class MyMath
     {
         public static float MoveTowards(float current, float target, float maxDelta)
         {

@@ -1,31 +1,41 @@
-﻿using System;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Horizon3.GameScene
 {
-    internal abstract class Bonus
+    public abstract class Bonus
     {
-        public static event Action<Point> OnBonusShoot;
-        public bool Active { get; set; }
+        public Point Target { get; set; }
+        public readonly List<Point> Dead = new List<Point>();
+        public readonly List<Bonus> Childs = new List<Bonus>();
 
-        protected Point index;
-        protected Texture2D Texture { get; set; }
-        private bool charged = true;
+        private int _score = 0;
 
-        public void Activate(Point index)
+        public int Execute(BlockData[,] blocks)
         {
-            if (charged)
+            FindTarget(target => OnEachTarget(target, blocks));
+
+            _score += Childs.Select(bonus => bonus.Execute(blocks)).Sum();
+            return _score;
+        }
+
+        protected abstract void FindTarget(Action<Point> callback);
+
+        private void OnEachTarget(Point target, BlockData[,] blocks)
+        {
+            if (CheckTarget(target, blocks))
             {
-                charged = false;
-                this.index = index;
-                Active = true;
+                _score++;
+                var block = blocks[target.X, target.Y];
+                block.Alive = false;
+                Dead.Add(target);
+                if (block.Bonus is { }) Childs.Add(block.Bonus);
             }
         }
 
-        protected void TryShoot(Point target) => OnBonusShoot?.Invoke(target);
-
-        public abstract void Update(GameTime gameTime);
-        public abstract void Draw(SpriteBatch spriteBatch, Vector2 position);
+        private bool CheckTarget(Point index, BlockData[,] blocks)
+            => Model.IsIndexInBounds(index) && blocks[index.X, index.Y].Alive;
     }
 }

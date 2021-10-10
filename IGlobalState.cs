@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Horizon3
 {
-    internal interface IGlobalState
+    public interface IGlobalState
     {
         public void Start() { }
         public void Stop() { }

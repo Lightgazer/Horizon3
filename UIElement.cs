@@ -5,7 +5,7 @@ using System;
 
 namespace Horizon3
 {
-    internal class UIElement
+    public class UIElement
     {
         public event Action OnClick;
 

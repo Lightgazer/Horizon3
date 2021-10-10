@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Horizon3
 {
-    internal class GameScreen : IGlobalState
+    public class GameScreen : IGlobalState
     {
         private readonly ContentManager _content;
 

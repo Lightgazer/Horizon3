@@ -8,32 +8,30 @@ using System.Linq;
 
 namespace Horizon3.GameScene
 {
-    internal class GameGrid
+    public class GameGrid
     {
-        public const int NumberOfBlockTypes = 5;
         public int Score { get; private set; }
 
         private const int GridSize = GameSettings.GridSize;
         private const int BlockSize = GameSettings.BlockSize;
-        private static readonly Random Random = new Random();
 
         private readonly ContentManager _content;
-        private readonly Texture2D[] _blockTextures;
         private readonly Texture2D _frameTexture;
-        private readonly Block[,] grid = new Block[GridSize, GridSize];
-        private MouseState lastMouseState;
-        private Rectangle gridRectangle;
-        private Point? selectedIndex;
+        private readonly Block[,] _grid = new Block[GridSize, GridSize];
+        private readonly BlockFactory _factory;
+        private MouseState _lastMouseState;
+        private Rectangle _gridRectangle;
+        private Point? _selectedIndex;
 
         public GameGrid(ContentManager content)
         {
             _content = content;
-            _blockTextures = LoadBlockTextures(content);
+            _factory = new BlockFactory(content);
             _frameTexture = content.Load<Texture2D>("frame");
             PopulateGrid();
 
             const int sideLength = GridSize * BlockSize;
-            gridRectangle = new Rectangle(
+            _gridRectangle = new Rectangle(
                 new Point((GameSettings.Width - sideLength) / 2, (GameSettings.Height - sideLength) / 2),
                 new Point(sideLength)
             );
@@ -62,7 +60,7 @@ namespace Horizon3.GameScene
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            var padding = new Vector2(gridRectangle.Location.X, gridRectangle.Location.Y);
+            var padding = new Vector2(_gridRectangle.Location.X, _gridRectangle.Location.Y);
             DrawBlocks(spriteBatch, padding);
             DrawBonuses(spriteBatch, padding);
             DrawFrame(spriteBatch, padding);
@@ -85,12 +83,12 @@ namespace Horizon3.GameScene
         private void TryKillBlock(Point index)
         {
             if (IsIndexInBounds(index))
-                KillBlock(grid[index.X, index.Y]);
+                KillBlock(_grid[index.X, index.Y]);
         }
 
         private void DrawFrame(SpriteBatch spriteBatch, Vector2 padding)
         {
-            if (selectedIndex is { } pointIndex)
+            if (_selectedIndex is { } pointIndex)
             {
                 var position = new Vector2(pointIndex.X * BlockSize, pointIndex.Y * BlockSize);
                 position += padding;
@@ -104,7 +102,7 @@ namespace Horizon3.GameScene
             {
                 for (var indexY = 0; indexY < GridSize; indexY++)
                 {
-                    var block = grid[indexX, indexY];
+                    var block = _grid[indexX, indexY];
                     var position = new Vector2((indexX * BlockSize), (indexY * BlockSize));
                     position += padding;
                     block.Draw(spriteBatch, position);
@@ -118,7 +116,7 @@ namespace Horizon3.GameScene
             {
                 for (var indexY = 0; indexY < GridSize; indexY++)
                 {
-                    var block = grid[indexX, indexY];
+                    var block = _grid[indexX, indexY];
                     var position = new Vector2((indexX * BlockSize), (indexY * BlockSize));
                     position += padding;
                     block.DrawBonus(spriteBatch, position);
@@ -141,7 +139,7 @@ namespace Horizon3.GameScene
                 var matchChain = new List<Block>();
                 for (var indexY = 0; indexY < GridSize; indexY++)
                 {
-                    var block = vertical ? grid[indexY, indexX] : grid[indexX, indexY];
+                    var block = vertical ? _grid[indexY, indexX] : _grid[indexX, indexY];
                     if (currentType == block.Type)
                     {
                         matchChain.Add(block);
@@ -185,19 +183,19 @@ namespace Horizon3.GameScene
         private void KillBlock(Block block, Bonus nextBonus = null)
         {
             Score++;
-            block.ActivateBonus(grid);
+            block.ActivateBonus(_grid);
             block.State = BlockState.Dead;
             block.NextBonus = nextBonus;
         }
 
         private void CleanCrossingFlags()
         {
-            grid.ForEach(block => block.CrossingFlag = false);
+            _grid.ForEach(block => block.CrossingFlag = false);
         }
 
         private void TriggerDrop()
         {
-            grid.ForEach((block, point) =>
+            _grid.ForEach((block, point) =>
             {
                 if (block.State == BlockState.Rotten) MarkDrop(point);
             });
@@ -208,74 +206,74 @@ namespace Horizon3.GameScene
             var (x, y) = point;
             while (y > 0)
             {
-                grid[x, y] = grid[x, y - 1];
-                grid[x, y].MoveFrom(new Vector2(0, -1));
+                _grid[x, y] = _grid[x, y - 1];
+                _grid[x, y].MoveFrom(new Vector2(0, -1));
                 y--;
             }
 
-            grid[x, 0] = CreateBlock();
-            grid[x, 0].MoveFrom(new Vector2(0, -1));
+            _grid[x, 0] = _factory.CreateBlock();
+            _grid[x, 0].MoveFrom(new Vector2(0, -1));
         }
 
         private void UpdateBlocks(GameTime gameTime)
         {
-            grid.ForEach(block => block.Update(gameTime));
+            _grid.ForEach(block => block.Update(gameTime));
         }
 
         private bool IsReadyForMatch()
         {
-            return grid.Cast<Block>().All(block => block.State == BlockState.Idle || block.State == BlockState.Suspect);
+            return _grid.Cast<Block>().All(block => block.State == BlockState.Idle || block.State == BlockState.Suspect);
         }
 
         private bool IsIdle()
         {
-            return grid.Cast<Block>().All(block => block.State == BlockState.Idle);
+            return _grid.Cast<Block>().All(block => block.State == BlockState.Idle);
         }
 
         private bool IsReadyForDrop()
         {
-            return grid.Cast<Block>().Any(block => block.State == BlockState.Rotten)
-                   && grid.Cast<Block>().All(block => block.State != BlockState.Moving);
+            return _grid.Cast<Block>().Any(block => block.State == BlockState.Rotten)
+                && _grid.Cast<Block>().All(block => block.State != BlockState.Moving);
         }
 
         private void SwapBlocks(Point first, Point second, BlockState setState)
         {
             var movementDirection = (first - second).ToVector2();
-            var firstBlock = grid[first.X, first.Y];
-            var secondBlock = grid[second.X, second.Y];
+            var firstBlock = _grid[first.X, first.Y];
+            var secondBlock = _grid[second.X, second.Y];
             firstBlock.State = setState;
             secondBlock.State = setState;
             firstBlock.MoveFrom(movementDirection);
             secondBlock.MoveFrom(-movementDirection);
-            grid[second.X, second.Y] = firstBlock;
-            grid[first.X, first.Y] = secondBlock;
+            _grid[second.X, second.Y] = firstBlock;
+            _grid[first.X, first.Y] = secondBlock;
         }
 
         private void ReleaseSuspects()
         {
-            var indices = grid.FindAllIndexOf(block => block.State == BlockState.Suspect);
+            var indices = _grid.FindAllIndexOf(block => block.State == BlockState.Suspect);
 
             if (indices.Count == 2)
                 SwapBlocks(indices[0], indices[1], BlockState.Idle);
             if (indices.Count == 1)
-                grid[indices[0].X, indices[0].Y].State = BlockState.Idle;
+                _grid[indices[0].X, indices[0].Y].State = BlockState.Idle;
         }
 
         private void ManagePlayerInput()
         {
             if (GetCellClick() is { } click)
             {
-                if (selectedIndex is { } pointIndex)
+                if (_selectedIndex is { } pointIndex)
                 {
                     if (IsSwapAllowed(pointIndex, click))
                     {
                         SwapBlocks(pointIndex, click, BlockState.Suspect);
-                        selectedIndex = null;
+                        _selectedIndex = null;
                         return;
                     }
                 }
 
-                selectedIndex = click;
+                _selectedIndex = click;
             }
         }
 
@@ -283,37 +281,20 @@ namespace Horizon3.GameScene
         {
             var mouseState = Mouse.GetState();
             Point? option = null;
-            if (lastMouseState.LeftButton == ButtonState.Released &&
+            if (_lastMouseState.LeftButton == ButtonState.Released &&
                 mouseState.LeftButton == ButtonState.Pressed &&
-                gridRectangle.Contains(mouseState.Position))
+                _gridRectangle.Contains(mouseState.Position))
             {
-                option = (mouseState.Position - gridRectangle.Location) / new Point(BlockSize);
+                option = (mouseState.Position - _gridRectangle.Location) / new Point(BlockSize);
             }
 
-            lastMouseState = mouseState;
+            _lastMouseState = mouseState;
             return option;
         }
 
         private void PopulateGrid()
         {
-            grid.ForEach((x, y) => grid[x, y] = CreateBlock());
-        }
-
-        private Block CreateBlock()
-        {
-            var type = Random.Next(NumberOfBlockTypes);
-            var block = new Block(type, _blockTextures[type]);
-            return block;
-        }
-
-        private static Texture2D[] LoadBlockTextures(ContentManager content)
-        {
-            var textures = new Texture2D[NumberOfBlockTypes];
-            for (var index = 0; index < NumberOfBlockTypes; index++)
-            {
-                textures[index] = content.Load<Texture2D>("blocks/block" + index.ToString());
-            }
-            return textures;
+            _grid.ForEach((x, y) => _grid[x, y] = _factory.CreateBlock());
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Horizon3
 {
-    internal class ScoreWidget : Label
+    public class ScoreWidget : Label
     {
         public int Score
         {

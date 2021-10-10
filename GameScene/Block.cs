@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Horizon3.GameScene
 {
-    internal enum BlockState
+    public enum BlockState
     {
         ///<summary>Двигается, либо падение, либо свап</summary>
         Moving,
@@ -23,7 +23,7 @@ namespace Horizon3.GameScene
         Idle
     }
 
-    internal class Block
+    public class Block
     {
         private const float RottenSize = 0.2f;
 

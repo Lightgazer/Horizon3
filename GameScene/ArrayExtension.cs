@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace Horizon3.GameScene
 {
-    internal static class ArrayExtension
+    public static class ArrayExtension
     {
         public static void ForEach<T>(this T[,] source, Action<T> callback) =>
             source.ForEach((x, y) => callback(source[x, y]));

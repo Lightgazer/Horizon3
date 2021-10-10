@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Horizon3
 {
-    internal abstract class Label
+    public abstract class Label
     {
         protected string Text = "";
         protected Vector2 Position;

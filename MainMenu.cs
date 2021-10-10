@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Horizon3
 {
-    internal class MainMenu : IGlobalState
+    public class MainMenu : IGlobalState
     {
         private readonly UIElement _button;
 

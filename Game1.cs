@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Horizon3
 {
-    internal class Game1 : Game
+    public class Game1 : Game
     {
         private readonly GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
