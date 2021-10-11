@@ -7,7 +7,7 @@ namespace Horizon3.GameScene.Bonuses
     {
         private readonly bool Vertical;
 
-        public LineBonus(bool vertical) : base()
+        public LineBonus(bool vertical)
         {
             Vertical = vertical;
         }

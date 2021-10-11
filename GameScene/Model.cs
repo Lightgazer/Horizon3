@@ -9,51 +9,160 @@ namespace Horizon3.GameScene
     {
         public int Type { get; set; }
         public bool Alive { get; set; } = true;
+        /// <summary>
+        /// Флаг которым пемечается последний передвинутый блок, на его месте может возникнуть бонус.
+        /// </summary>
         public bool Suspect { get; set; }
         public Bonus Bonus { get; set; }
     }
 
+    public abstract class Turn { }
+
+    public class AnimationTurn : Turn
+    {
+        public AnimationTurn(BlockData[,] blocks, List<Bonus> bonuses, List<Point> dead) { }
+    }
+
+    public class DropTurn : Turn
+    {
+        public DropTurn(BlockData[,] blocks, List<Point> drop) { }
+    }
+
+    public class IdleTurn : Turn
+    {
+        public IdleTurn(BlockData[,] blocks) { }
+    }
+
+    public class SwapTurn : Turn
+    {
+        public SwapTurn(BlockData[,] blocks, Point first, Point second) { }
+    }
+
+    public class SwapInfo
+    {
+        public readonly Point First;
+        public readonly Point Second;
+
+        public SwapInfo(Point first, Point second)
+        {
+            First = first;
+            Second = second;
+        }
+    }
+
+    /// <summary>
+    /// Модель отвечает исполнение правил игры. Игра представлена поледовательностью ходов(раундов)
+    /// разного вида, генерируемых моделью.
+    /// </summary>
     public class Model
     {
-        public const int GridSize = GameSettings.GridSize;
+        private const int GridSize = GameSettings.GridSize;
         private static readonly Random Random = new Random();
 
         public int Score { get; private set; } = 0;
 
         //индексы которые умерли в текущем раунде от матчей, без учёта бонусов
-        public List<Point> Dead { get; private set; }
+        //public List<Point> Dead { get; private set; }
         //список бонусов сработавших в этом раунде
-        public List<Bonus> Bonuses {  get; private set; }
+        //public List<Bonus> Bonuses { get; private set; }
         //список блоков которые падают в начале текущего раунда
-        public List<Point> Drop { get; private set; }
+        //public List<Point> Drop { get; private set; }
         //Игровое поле после смертей, падений и бонусов в текущем раунде
-        public BlockData[,] Blocks { get; } = new BlockData[GridSize, GridSize];
+        private readonly BlockData[,] _blocks = new BlockData[GridSize, GridSize];
+        private readonly IEnumerator<Turn> _enumerator;
+
+        private SwapInfo _swap;
 
         public Model()
         {
-            Blocks.ForEach((x, y) => Blocks[x, y] = CreateBlock());
-            NextTurn();
+            _blocks.ForEach((x, y) => _blocks[x, y] = CreateBlock());
+            var iter = TurnIterator();
+            _enumerator = iter.GetEnumerator();
         }
 
         public static bool IsIndexInBounds(Point index)
             => index.X >= 0 && index.X < GridSize && index.Y >= 0 && index.Y < GridSize;
 
-        public void NextTurn()
+        public Turn GetNextTurn()
         {
-            if (IsIdle())
-            {
-                var matches = FindMatches();
-                Bonuses = CollectBonuses(matches);
-                Score += ExecuteMatches(matches);
-                Dead = CollectDead();
-                Score += ExecuteBonuses();
-            }
-            Drop = MakeDropList();
-            DropBlocks();
+            _enumerator.MoveNext();
+            return _enumerator.Current;
         }
 
-        public bool IsIdle()
-            => Blocks.Cast<BlockData>().All(block => block != null && block.Alive == true);
+        public bool SwapBlocks(Point first, Point second)
+        {
+            if (IsSwapAllowed(first, second))
+            {
+                var block1 = _blocks.GetValue(first);
+                var block2 = _blocks.GetValue(second);
+                block1.Suspect = true;
+                block2.Suspect = true;
+                _blocks.SetValue(first, block2);
+                _blocks.SetValue(second, block1);
+                _swap = new SwapInfo(first, second);
+                return true;
+            }
+            return false;
+        }
+
+        private IEnumerable<Turn> TurnIterator()
+        {
+            while (true)
+            {
+                var matches = FindMatches();
+                if (matches.Count > 0)
+                {
+                    var bonuses = CollectBonuses(matches);
+                    Score += ExecuteMatches(matches);
+                    var dead = CollectDead();
+                    Score += ExecuteBonuses(bonuses);
+                    yield return new AnimationTurn(_blocks, bonuses, dead);
+                    while (!IsAllBlocksAlive())
+                    {
+                        var drop = MakeDropList();
+                        yield return new DropTurn(_blocks, drop);
+                        DropBlocks(drop);
+                    }
+                }
+                else if (_swap is { })
+                {
+                    ReturnSwapedBlocks();
+                    yield return new SwapTurn(_blocks, _swap.Second, _swap.First);
+                    _swap = null;
+                }
+                ReleaseSuspects();
+
+                while (_swap is null) yield return new IdleTurn(_blocks);
+
+                yield return new SwapTurn(_blocks, _swap.First, _swap.Second);
+            }
+        }
+
+        private static bool IsSwapAllowed(Point first, Point second)
+        {
+            if (first.X == second.X)
+                return Math.Abs(first.Y - second.Y) == 1;
+            if (first.Y == second.Y)
+                return Math.Abs(first.X - second.X) == 1;
+            return false;
+        }
+
+        private void ReturnSwapedBlocks()
+        {
+            var block1 = _blocks.GetValue(_swap.First);
+            var block2 = _blocks.GetValue(_swap.Second);
+            _blocks.SetValue(_swap.First, block2);
+            _blocks.SetValue(_swap.Second, block1);
+
+        }
+
+        private void ReleaseSuspects()
+        {
+            _blocks.ForEach(block => block.Suspect = false);
+        }
+
+        private bool IsAllBlocksAlive()
+            => _blocks.Cast<BlockData>().All(block => block.Alive);
 
         private List<MatchChain> FindMatches()
         {
@@ -72,7 +181,7 @@ namespace Horizon3.GameScene
                 for (var j = 0; j < GridSize; j++)
                 {
                     var (x, y) = vertical ? (j, k) : (k, j);
-                    var block = Blocks[x, y];
+                    var block = _blocks[x, y];
                     if (block.Bonus is { }) block.Bonus.Target = new Point(x, y);
                     if (currentType == block.Type)
                     {
@@ -112,7 +221,8 @@ namespace Horizon3.GameScene
         private List<Point> CollectDead()
         {
             var list = new List<Point>();
-            Blocks.ForEach((block, point) => { 
+            _blocks.ForEach((block, point) =>
+            {
                 if (!block.Alive) list.Add(point);
                 if (block.Bonus is { }) block.Alive = true;     //воскрешаем блоки получившие бонус
             });
@@ -120,8 +230,8 @@ namespace Horizon3.GameScene
         }
 
         ///<returns>Очки за исполнение бонусов, учитываются только живые блоки</returns>
-        private int ExecuteBonuses()
-           => Bonuses.Select(bonus => bonus.Execute(Blocks)).Sum();
+        private int ExecuteBonuses(List<Bonus> list)
+           => list.Select(bonus => bonus.Execute(_blocks)).Sum();
 
         private List<Point> MakeDropList()
         {
@@ -130,9 +240,10 @@ namespace Horizon3.GameScene
             {
                 for (int y = 0; y < GridSize; y++)
                 {
-                    if (!Blocks[x, y].Alive)
+                    if (!_blocks[x, y].Alive)
                     {
-                        list.Add(new Point(x, y));
+                        while (y > 0)
+                            list.Add(new Point(x, --y));
                         break;
                     }
                 }
@@ -140,19 +251,18 @@ namespace Horizon3.GameScene
             return list;
         }
 
-        private void DropBlocks()
+        private void DropBlocks(List<Point> list)
         {
-            Drop.ForEach(point =>
+            list.ForEach(point =>
             {
                 var (x, y) = point;
-                while (y > 0)
-                {
-                    Blocks[x, y] = Blocks[x, y - 1];
-                    y--;
-                }
-
-                Blocks[x, 0] = CreateBlock();
+                _blocks[x, y + 1] = _blocks[x, y];
             });
+            list
+                .Select(point => point.X)
+                .Distinct()
+                .ToList()
+                .ForEach(x => _blocks[x, 0] = CreateBlock());
         }
     }
 }
