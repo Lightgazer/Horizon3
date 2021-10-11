@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Horizon3.GameScene
+namespace Horizon3.GameScene.Model
 {
     public class BlockData
     {
@@ -16,30 +16,52 @@ namespace Horizon3.GameScene
         public Bonus Bonus { get; set; }
     }
 
-    public abstract class Turn { }
+    public interface ITurn { }
 
-    public class AnimationTurn : Turn
+    public class AnimationTurn : ITurn
     {
-        public AnimationTurn(BlockData[,] blocks, List<Bonus> bonuses, List<Point> dead) { }
+        public readonly BlockData[,] Blocks;
+        public readonly List<Bonus> Bonuses;
+        public readonly List<Point> Dead;
+        public AnimationTurn(BlockData[,] blocks, List<Bonus> bonuses, List<Point> dead)
+        {
+            Blocks = blocks;
+            Bonuses = bonuses;
+            Dead = dead;
+        }
     }
 
-    public class DropTurn : Turn
+    public class DropTurn : ITurn
     {
-        public DropTurn(BlockData[,] blocks, List<Point> drop) { }
+        public readonly BlockData[,] Blocks;
+        public readonly List<Point> Drop;
+        public DropTurn(BlockData[,] blocks, List<Point> drop)
+        {
+            Blocks = blocks;
+            Drop = drop;
+        }
     }
 
-    public class IdleTurn : Turn
+    public class IdleTurn : ITurn
     {
-        public BlockData[,] Blocks;
+        public readonly BlockData[,] Blocks;
         public IdleTurn(BlockData[,] blocks)
         {
             Blocks = blocks;
         }
     }
 
-    public class SwapTurn : Turn
+    public class SwapTurn : ITurn
     {
-        public SwapTurn(BlockData[,] blocks, Point first, Point second) { }
+        public readonly BlockData[,] Blocks;
+        public readonly Point First;
+        public readonly Point Second;
+        public SwapTurn(BlockData[,] blocks, Point first, Point second)
+        {
+            Blocks = blocks;
+            First = first;
+            Second = second;
+        }
     }
 
     public class SwapInfo
@@ -58,7 +80,7 @@ namespace Horizon3.GameScene
     /// Модель отвечает исполнение правил игры. Игра представлена поледовательностью ходов(раундов)
     /// разного вида, генерируемых моделью.
     /// </summary>
-    public class Model
+    public class GameModel
     {
         public const int NumberOfBlockTypes = 5;
         public const int GridSize = 8;
@@ -74,11 +96,11 @@ namespace Horizon3.GameScene
         //public List<Point> Drop { get; private set; }
         //Игровое поле после смертей, падений и бонусов в текущем раунде
         private readonly BlockData[,] _blocks = new BlockData[GridSize, GridSize];
-        private readonly IEnumerator<Turn> _enumerator;
+        private readonly IEnumerator<ITurn> _enumerator;
 
         private SwapInfo _swap;
 
-        public Model()
+        public GameModel()
         {
             _blocks.ForEach((x, y) => _blocks[x, y] = CreateBlock());
             var iter = TurnIterator();
@@ -88,7 +110,7 @@ namespace Horizon3.GameScene
         public static bool IsIndexInBounds(Point index)
             => index.X >= 0 && index.X < GridSize && index.Y >= 0 && index.Y < GridSize;
 
-        public Turn GetNextTurn()
+        public ITurn GetNextTurn()
         {
             _enumerator.MoveNext();
             return _enumerator.Current;
@@ -110,7 +132,7 @@ namespace Horizon3.GameScene
             return false;
         }
 
-        private IEnumerable<Turn> TurnIterator()
+        private IEnumerable<ITurn> TurnIterator()
         {
             while (true)
             {

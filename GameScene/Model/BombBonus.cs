@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 
-namespace Horizon3.GameScene.Bonuses
+namespace Horizon3.GameScene.Model
 {
     public class BombBonus : Bonus
     {

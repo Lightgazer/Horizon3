@@ -25,11 +25,6 @@ namespace Horizon3
             _timer = new GameTimer(_content, 60d);
         }
 
-        public void Stop()
-        {
-            grid.Unsubscribe();
-        }
-
         public void Update(GameTime gameTime)
         {
             grid.Update(gameTime);

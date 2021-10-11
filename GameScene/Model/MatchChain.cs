@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Horizon3.GameScene.Bonuses;
 
-namespace Horizon3.GameScene
+namespace Horizon3.GameScene.Model
 {
     public class MatchChain
     {

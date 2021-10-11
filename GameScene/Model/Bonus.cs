@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Horizon3.GameScene
+namespace Horizon3.GameScene.Model
 {
     public abstract class Bonus
     {
@@ -36,6 +36,6 @@ namespace Horizon3.GameScene
         }
 
         private bool CheckTarget(Point index, BlockData[,] blocks)
-            => Model.IsIndexInBounds(index) && blocks[index.X, index.Y].Alive;
+            => GameModel.IsIndexInBounds(index) && blocks[index.X, index.Y].Alive;
     }
 }
