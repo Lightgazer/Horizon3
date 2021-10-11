@@ -30,7 +30,11 @@ namespace Horizon3.GameScene
 
     public class IdleTurn : Turn
     {
-        public IdleTurn(BlockData[,] blocks) { }
+        public BlockData[,] Blocks;
+        public IdleTurn(BlockData[,] blocks)
+        {
+            Blocks = blocks;
+        }
     }
 
     public class SwapTurn : Turn
@@ -56,7 +60,8 @@ namespace Horizon3.GameScene
     /// </summary>
     public class Model
     {
-        private const int GridSize = GameSettings.GridSize;
+        public const int NumberOfBlockTypes = 5;
+        public const int GridSize = 8;
         private static readonly Random Random = new Random();
 
         public int Score { get; private set; } = 0;
@@ -215,7 +220,7 @@ namespace Horizon3.GameScene
             => matches.Select(match => match.Execute()).Sum();
 
         private static BlockData CreateBlock()
-            => new BlockData { Type = Random.Next() };
+            => new BlockData { Type = Random.Next(NumberOfBlockTypes) };
 
 
         private List<Point> CollectDead()

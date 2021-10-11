@@ -8,6 +8,78 @@ using System.Linq;
 
 namespace Horizon3.GameScene
 {
+    public abstract class GameState
+    {
+        protected const int BlockSize = GameSettings.BlockSize;
+        protected static Vector2 Origin = new Vector2(GameSettings.BlockSize / 2);
+
+        protected readonly Texture2D[] BlockTextures;
+        
+        public GameState(ContentManager content)
+        {
+            BlockTextures = LoadBlockTextures(content);
+        }
+
+        private static Texture2D[] LoadBlockTextures(ContentManager content)
+        {
+            var textures = new Texture2D[Model.NumberOfBlockTypes];
+            for (var index = 0; index < Model.NumberOfBlockTypes; index++)
+            {
+                textures[index] = content.Load<Texture2D>("blocks/block" + index.ToString());
+            }
+            return textures;
+        }
+    }
+
+    public class IdleState : GameState
+    {
+        private readonly Texture2D _frameTexture;
+        private readonly IdleTurn _turn;
+        private Point? _selectedIndex;
+
+        public IdleState(ContentManager content, IdleTurn turn) : base(content) {
+            _frameTexture = content.Load<Texture2D>("frame");
+            _turn = turn;
+        }
+
+        public void Update(GameTime gameTime) { }
+
+        public void Draw(SpriteBatch spriteBatch, Vector2 padding)
+        {
+            DrawBlocks(spriteBatch, padding);
+            DrawFrame(spriteBatch, padding);
+        }
+
+        private void DrawBlocks(SpriteBatch spriteBatch, Vector2 padding)
+        {
+            for (var indexX = 0; indexX < Model.GridSize; indexX++)
+            {
+                for (var indexY = 0; indexY < Model.GridSize; indexY++)
+                {
+                    var block = _turn.Blocks[indexX, indexY];
+                    var texture = BlockTextures[block.Type];
+                    var position = new Vector2(indexX * BlockSize, indexY * BlockSize) + padding + Origin;
+                    spriteBatch.Draw(texture, position, Color.White);
+                    //var size = 1;
+                    //spriteBatch.Draw(texture, position, null, Color.White, 0f, Origin, size, SpriteEffects.None, 0f);
+                    if (block.Bonus is { })
+                    {
+
+                    }
+                }
+            }
+        }
+
+        private void DrawFrame(SpriteBatch spriteBatch, Vector2 padding)
+        {
+            if (_selectedIndex is { } pointIndex)
+            {
+                var position = new Vector2(pointIndex.X * BlockSize, pointIndex.Y * BlockSize) + padding;
+                spriteBatch.Draw(_frameTexture, position, Color.White);
+            }
+        }
+    }
+
     public class GameGrid
     {
         public int Score { get; private set; }

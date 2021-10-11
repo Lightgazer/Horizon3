@@ -12,7 +12,6 @@ namespace Horizon3.GameScene
         public static void SetValue<T>(this T[,] source, Point index, T value)
             => source[index.X, index.Y] = value;
 
-
         public static void ForEach<T>(this T[,] source, Action<T> callback)
             => source.ForEach((x, y) => callback(source[x, y]));
 
