@@ -35,7 +35,7 @@ namespace Horizon3.GameScene.Model
             }
         }
 
-        private bool CheckTarget(Point index, BlockData[,] blocks)
+        private static bool CheckTarget(Point index, BlockData[,] blocks)
             => GameModel.IsIndexInBounds(index) && blocks[index.X, index.Y].Alive;
     }
 }

@@ -21,7 +21,9 @@ namespace Horizon3.GameScene.Model
     public class AnimationTurn : ITurn
     {
         public readonly BlockData[,] Blocks;
+        //список бонусов сработавших в этом раунде
         public readonly List<Bonus> Bonuses;
+        //индексы которые умерли в текущем раунде от матчей, без учёта бонусов
         public readonly List<Point> Dead;
         public AnimationTurn(BlockData[,] blocks, List<Bonus> bonuses, List<Point> dead)
         {
@@ -34,6 +36,7 @@ namespace Horizon3.GameScene.Model
     public class DropTurn : ITurn
     {
         public readonly BlockData[,] Blocks;
+        //список блоков которые падают в начале текущего раунда
         public readonly List<Point> Drop;
         public DropTurn(BlockData[,] blocks, List<Point> drop)
         {
@@ -88,13 +91,6 @@ namespace Horizon3.GameScene.Model
 
         public int Score { get; private set; } = 0;
 
-        //индексы которые умерли в текущем раунде от матчей, без учёта бонусов
-        //public List<Point> Dead { get; private set; }
-        //список бонусов сработавших в этом раунде
-        //public List<Bonus> Bonuses { get; private set; }
-        //список блоков которые падают в начале текущего раунда
-        //public List<Point> Drop { get; private set; }
-        //Игровое поле после смертей, падений и бонусов в текущем раунде
         private readonly BlockData[,] _blocks = new BlockData[GridSize, GridSize];
         private readonly IEnumerator<ITurn> _enumerator;
 
@@ -118,7 +114,7 @@ namespace Horizon3.GameScene.Model
 
         public bool SwapBlocks(Point first, Point second)
         {
-            if (IsSwapAllowed(first, second))
+            if (IsAllBlocksAlive() && IsSwapAllowed(first, second))
             {
                 var block1 = _blocks.GetValue(first);
                 var block2 = _blocks.GetValue(second);

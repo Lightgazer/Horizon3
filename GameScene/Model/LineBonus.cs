@@ -5,7 +5,7 @@ namespace Horizon3.GameScene.Model
 {
     public class LineBonus : Bonus
     {
-        private readonly bool Vertical;
+        public readonly bool Vertical;
 
         public LineBonus(bool vertical)
         {

@@ -6,10 +6,7 @@ namespace Horizon3
     {
         public int Score
         {
-            set
-            {
-                Text = "Score: " + value;
-            }
+            set { Text = "Score: " + value; }
         }
 
         public ScoreWidget(ContentManager content) : base(content) { }
