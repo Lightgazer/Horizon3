@@ -32,7 +32,7 @@ namespace Horizon3
             GlobalStateContext.Add(new MainMenu(Content));
             GlobalStateContext.Add(new GameScreen(Content));
             GlobalStateContext.Add(new EndMenu(Content));
-            //GlobalStateContext.LoadScene<MainMenu>();
+            GlobalStateContext.ChangeState<MainMenu>();
         }
 
         protected override void Update(GameTime gameTime)

@@ -13,7 +13,7 @@ namespace Horizon3.GameScene
     /// </summary>
     public class GameContext
     {
-        public int Score { get { return Model.Score; } }
+        public int Score => Model.Score;
         public readonly GameModel Model;
 
         private readonly ContentManager _content;

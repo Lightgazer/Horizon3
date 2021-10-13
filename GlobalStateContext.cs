@@ -8,7 +8,7 @@ namespace Horizon3
     public static class GlobalStateContext
     {
         private static readonly List<IGlobalState> Scenes = new List<IGlobalState>();
-        private static IGlobalState CurrentScene;
+        private static IGlobalState _currentScene;
 
         public static void Add(IGlobalState scene)
         {
@@ -25,19 +25,19 @@ namespace Horizon3
         {
             if (Scenes.ElementAtOrDefault(index) is { } scene)
             {
-                CurrentScene = scene;
-                CurrentScene.Start();
+                _currentScene = scene;
+                _currentScene.Start();
             }
         }
 
         public static void Update(GameTime gameTime)
         {
-            CurrentScene?.Update(gameTime);
+            _currentScene?.Update(gameTime);
         }
 
         public static void Draw(SpriteBatch spriteBatch)
         {
-            CurrentScene?.Draw(spriteBatch);
+            _currentScene?.Draw(spriteBatch);
         }
     }
 }

@@ -7,7 +7,6 @@ namespace Horizon3
     {
         public static float MoveTowards(float current, float target, float maxDelta)
         {
-            //System.Diagnostics.Debug.WriteLine((target - current).ToString());
             if (MathF.Abs(target - current) <= maxDelta)
             {
                 return target;

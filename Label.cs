@@ -10,7 +10,7 @@ namespace Horizon3
         protected Vector2 Position;
         private readonly SpriteFont _font;
 
-        public Label(ContentManager content)
+        protected Label(ContentManager content)
         {
             _font = content.Load<SpriteFont>("Font");
         }

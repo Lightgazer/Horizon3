@@ -30,8 +30,8 @@ namespace Horizon3.GameScene
 
         protected static bool IsOver(BonusLogic bonus, float[,] shrink, List<BonusAnimation> childs)
         {
-            return bonus.Dead.All(index => shrink.GetValue(index) == TargetSizeShrink)
-                && childs.All(bonus => bonus.Over);
+            return bonus.Dead.All(index => Math.Abs(shrink.GetValue(index) - TargetSizeShrink) < float.Epsilon)
+                && childs.All(child => child.Over);
         }
     }
 
@@ -49,7 +49,7 @@ namespace Horizon3.GameScene
 
         public LineBonusAnimation(LineBonus bonus, ContentManager content)
         {
-            _childs = bonus.Childs.Select(bonus => Create(bonus, content)).ToList();
+            _childs = bonus.Childs.Select(child => Create(child, content)).ToList();
             _texture = content.Load<Texture2D>("bonuses/line");
             _bn = bonus;
             Target = bonus.Target;
@@ -89,7 +89,8 @@ namespace Horizon3.GameScene
             var blockIndex = Target + position;
             var screenPosition = blockIndex.ToVector2() * BlockSize + GameState.Padding;
             screenPosition += _bn.Vertical ? new Vector2(0, displacement) : new Vector2(displacement, 0);
-            spriteBatch.Draw(_texture, screenPosition + GameState.Origin, null, Color.White, rotation, GameState.Origin, 1, SpriteEffects.None, 0f);
+            spriteBatch.Draw(_texture, screenPosition + GameState.Origin, null, Color.White, rotation,
+                GameState.Origin, 1, SpriteEffects.None, 0f);
         }
 
         private bool MoveDestructor(GameTime gameTime)
@@ -121,8 +122,7 @@ namespace Horizon3.GameScene
 
         private void ShrinkBlocks(GameTime gameTime, float[,] shrink)
         {
-            const float coefficient = 1.3f; // коэфициент связаный с тем что блоки умершие от этого бонуса уменьшаются чуть быстрее
-            var delta = (float)gameTime.ElapsedGameTime.TotalSeconds * GameSettings.AnimationSpeed * coefficient;
+            var delta = (float)gameTime.ElapsedGameTime.TotalSeconds * GameSettings.AnimationSpeed;
 
             _activeDead.ForEach(index =>
             {
@@ -141,7 +141,7 @@ namespace Horizon3.GameScene
 
         public BombBonusAnimation(BombBonus bonus, ContentManager content)
         {
-            _childs = bonus.Childs.Select(bonus => Create(bonus, content)).ToList();
+            _childs = bonus.Childs.Select(child => Create(child, content)).ToList();
             _bn = bonus;
         }
 

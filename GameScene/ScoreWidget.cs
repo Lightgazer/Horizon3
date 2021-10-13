@@ -1,13 +1,10 @@
 ﻿using Microsoft.Xna.Framework.Content;
 
-namespace Horizon3
+namespace Horizon3.GameScene
 {
     public class ScoreWidget : Label
     {
-        public int Score
-        {
-            set { Text = "Score: " + value; }
-        }
+        public int Score { set => Text = "Score: " + value; }
 
         public ScoreWidget(ContentManager content) : base(content) { }
     }

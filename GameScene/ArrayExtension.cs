@@ -21,8 +21,8 @@ namespace Horizon3.GameScene
         public static void ForEach<T>(this T[,] source, Action<int, int> action)
         {
             for (var x = 0; x < source.GetLength(0); x++)
-                for (var y = 0; y < source.GetLength(1); y++)
-                    action(x, y);
+            for (var y = 0; y < source.GetLength(1); y++)
+                action(x, y);
         }
 
         public static List<Point> FindAllIndexOf<T>(this T[,] source, Func<T, bool> predicate)
