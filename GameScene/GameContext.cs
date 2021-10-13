@@ -1,13 +1,17 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Horizon3.GameScene.Model;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Linq;
-using Horizon3.GameScene.Model;
 
 namespace Horizon3.GameScene
 {
-    public class GameGrid
+    /// <summary>
+    /// Игровое поле реализовано паттерном состояние. Состояния сами решают когда они
+    /// заканчиваются вызывая NextTurn у контекста. Контекст используя модель
+    /// выбирает следующие состояние.
+    /// </summary>
+    public class GameContext
     {
         public int Score { get { return Model.Score; } }
         public readonly GameModel Model;
@@ -16,7 +20,7 @@ namespace Horizon3.GameScene
         private GameState _state;
 
 
-        public GameGrid(ContentManager content, GameModel model)
+        public GameContext(ContentManager content, GameModel model)
         {
             Model = model;
             _content = content;

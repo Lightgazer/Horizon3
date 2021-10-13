@@ -35,8 +35,8 @@ namespace Horizon3
         private bool IsClicked()
         {
             var mouseState = Mouse.GetState();
-            if (_lastMouseState.LeftButton == ButtonState.Released && 
-                mouseState.LeftButton == ButtonState.Pressed && 
+            if (_lastMouseState.LeftButton == ButtonState.Released &&
+                mouseState.LeftButton == ButtonState.Pressed &&
                 _rectangle.Contains(mouseState.Position))
             {
                 return true;

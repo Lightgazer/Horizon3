@@ -34,7 +34,7 @@ namespace Horizon3
 
         private void ButtonOnClick()
         {
-            GlobalStateContext.LoadScene<MainMenu>();
+            GlobalStateContext.ChangeState<MainMenu>();
         }
     }
 }

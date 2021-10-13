@@ -32,14 +32,11 @@ namespace Horizon3
             GlobalStateContext.Add(new MainMenu(Content));
             GlobalStateContext.Add(new GameScreen(Content));
             GlobalStateContext.Add(new EndMenu(Content));
-            GlobalStateContext.LoadScene<MainMenu>();
+            //GlobalStateContext.LoadScene<MainMenu>();
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
             GlobalStateContext.Update(gameTime);
 
             base.Update(gameTime);

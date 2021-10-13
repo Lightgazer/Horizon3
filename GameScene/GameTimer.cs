@@ -17,8 +17,7 @@ namespace Horizon3.GameScene
         {
             _timeLeft -= gameTime.ElapsedGameTime.TotalSeconds;
             Text = "Time Left: " + (int)_timeLeft;
-            if (_timeLeft < 0) GlobalStateContext.LoadScene<EndMenu>();
+            if (_timeLeft < 0) GlobalStateContext.ChangeState<EndMenu>();
         }
-
     }
 }

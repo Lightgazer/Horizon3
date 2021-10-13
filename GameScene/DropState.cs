@@ -6,6 +6,9 @@ using System;
 
 namespace Horizon3.GameScene
 {
+    /// <summary>
+    /// В этом состоянии игра отображает анимацию падения блоков на пустые места.
+    /// </summary>
     public class DropState : GameState
     {
         private readonly DropTurn _turn;
@@ -16,13 +19,17 @@ namespace Horizon3.GameScene
             _turn = turn;
         }
 
-        public override void Update(GameTime gameTime, GameGrid context)
+        public override void Update(GameTime gameTime, GameContext context)
         {
-            const float target = -BlockSize;
+            const float target = BlockSize;
+            if (Math.Abs(_displacement - target) < float.Epsilon)
+            {
+                context.NextTurn();
+                return;
+            }
             var delta = (float)gameTime.ElapsedGameTime.TotalSeconds * BlockSize * 2 *
                             GameSettings.AnimationSpeed;
-            _displacement += MyMath.MoveTowards(_displacement, target, delta);
-            if (Math.Abs(_displacement - target) < float.Epsilon) context.NextTurn();
+            _displacement = MyMath.MoveTowards(_displacement, target, delta);
         }
 
         public override void Draw(SpriteBatch spriteBatch)

@@ -7,26 +7,24 @@ namespace Horizon3
 {
     public static class GlobalStateContext
     {
-        public static IGlobalState CurrentScene { get; private set; }
-
         private static readonly List<IGlobalState> Scenes = new List<IGlobalState>();
+        private static IGlobalState CurrentScene;
 
         public static void Add(IGlobalState scene)
         {
             Scenes.Add(scene);
         }
 
-        public static void LoadScene<T>() where T : IGlobalState
+        public static void ChangeState<T>() where T : IGlobalState
         {
             var index = Scenes.FindIndex(scene => scene is T);
-            LoadScene(index);
+            ChangeState(index);
         }
 
-        public static void LoadScene(int index)
+        public static void ChangeState(int index)
         {
             if (Scenes.ElementAtOrDefault(index) is { } scene)
             {
-                CurrentScene?.Stop();
                 CurrentScene = scene;
                 CurrentScene.Start();
             }
@@ -34,12 +32,12 @@ namespace Horizon3
 
         public static void Update(GameTime gameTime)
         {
-            CurrentScene.Update(gameTime);
+            CurrentScene?.Update(gameTime);
         }
 
         public static void Draw(SpriteBatch spriteBatch)
         {
-            CurrentScene.Draw(spriteBatch);
+            CurrentScene?.Draw(spriteBatch);
         }
     }
 }

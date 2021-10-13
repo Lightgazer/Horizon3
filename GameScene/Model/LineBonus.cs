@@ -3,7 +3,7 @@ using System;
 
 namespace Horizon3.GameScene.Model
 {
-    public class LineBonus : Bonus
+    public class LineBonus : BonusLogic
     {
         public readonly bool Vertical;
 

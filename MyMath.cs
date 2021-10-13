@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using System;
 
 namespace Horizon3
 {
@@ -7,11 +7,13 @@ namespace Horizon3
     {
         public static float MoveTowards(float current, float target, float maxDelta)
         {
+            //System.Diagnostics.Debug.WriteLine((target - current).ToString());
             if (MathF.Abs(target - current) <= maxDelta)
             {
                 return target;
             }
-            return current + MathF.Sign(target - current) * maxDelta;
+            var delta = MathF.Sign(target - current) * maxDelta;
+            return current + delta;
         }
 
         public static Vector2 MoveTowards(Vector2 current, Vector2 target, float maxDistanceDelta)

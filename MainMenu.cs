@@ -28,7 +28,7 @@ namespace Horizon3
 
         private void ButtonOnClick()
         {
-            GlobalStateContext.LoadScene<GameScreen>();
+            GlobalStateContext.ChangeState<GameScreen>();
         }
     }
 }

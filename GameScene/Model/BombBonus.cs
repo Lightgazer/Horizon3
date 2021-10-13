@@ -3,7 +3,7 @@ using System;
 
 namespace Horizon3.GameScene.Model
 {
-    public class BombBonus : Bonus
+    public class BombBonus : BonusLogic
     {
         protected override void FindTarget(Action<Point> callback)
         {

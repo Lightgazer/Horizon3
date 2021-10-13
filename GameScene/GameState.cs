@@ -1,8 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Horizon3.GameScene.Model;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using System;
-using Horizon3.GameScene.Model;
 
 namespace Horizon3.GameScene
 {
@@ -12,7 +12,7 @@ namespace Horizon3.GameScene
         private const int sideLength = GameModel.GridSize * BlockSize;
 
         public static Vector2 Padding = new Point((GameSettings.Width - sideLength) / 2, (GameSettings.Height - sideLength) / 2).ToVector2();
-        protected static Vector2 Origin = new Vector2(GameSettings.BlockSize / 2);
+        public static Vector2 Origin = new Vector2(GameSettings.BlockSize / 2);
 
         protected readonly Texture2D[] BlockTextures;
         protected readonly Rectangle GridRectangle;
@@ -28,7 +28,7 @@ namespace Horizon3.GameScene
             _LineTexture = content.Load<Texture2D>("bonuses/line");
         }
 
-        public abstract void Update(GameTime gameTime, GameGrid context);
+        public abstract void Update(GameTime gameTime, GameContext context);
 
         public abstract void Draw(SpriteBatch spriteBatch);
 
@@ -41,7 +41,12 @@ namespace Horizon3.GameScene
                 null => null,
                 _ => throw new NotImplementedException("bonus icon missing")
             };
-            if (texture is { }) spriteBatch.Draw(texture, position, Color.White);
+            var rotation = 0f;
+            if (block.Bonus is LineBonus line && line.Vertical == false)
+                rotation = 1.57f;
+
+            if (texture is { })
+                spriteBatch.Draw(texture, position + Origin, null, Color.White, rotation, Origin, 1, SpriteEffects.None, 0f);
         }
 
         private static Texture2D[] LoadBlockTextures(ContentManager content)

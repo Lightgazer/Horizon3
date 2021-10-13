@@ -8,21 +8,26 @@ using System.Linq;
 
 namespace Horizon3.GameScene
 {
+    /// <summary>
+    /// В этом состоянии игра отображает анимацию уменьшения блоков попавших в матч 
+    /// и анимацию бонусов. 
+    /// </summary>
     public class AnimationState : GameState
     {
         public const float TargetSizeShrink = 0.8f;
         private readonly AnimationTurn _turn;
         private readonly float[,] _shrinkGrid;
+        private readonly List<BonusAnimation> _bonuses;
         private float _localShrink = 0;
-        private List<BonusAnimation> _bonuses;
 
         public AnimationState(AnimationTurn turn, ContentManager content) : base(content)
         {
             _turn = turn;
             _shrinkGrid = new float[turn.Blocks.Length, turn.Blocks.Length];
+            _bonuses = turn.Bonuses.Select(b => BonusAnimation.Create(b, content)).ToList();
         }
 
-        public override void Update(GameTime gameTime, GameGrid context)
+        public override void Update(GameTime gameTime, GameContext context)
         {
             var delta = (float)gameTime.ElapsedGameTime.TotalSeconds * GameSettings.AnimationSpeed;
             _localShrink = MyMath.MoveTowards(_localShrink, TargetSizeShrink, delta);
@@ -52,6 +57,6 @@ namespace Horizon3.GameScene
         }
 
         private bool IsOver()
-            => Math.Abs(_localShrink - TargetSizeShrink) < float.Epsilon && _bonuses.All(bonus => !bonus.IsActive());
+            => Math.Abs(_localShrink - TargetSizeShrink) < float.Epsilon && _bonuses.All(bonus => bonus.Over);
     }
 }

@@ -1,11 +1,14 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Horizon3.GameScene.Model;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Content;
-using Horizon3.GameScene.Model;
 
 namespace Horizon3.GameScene
 {
+    /// <summary>
+    /// В этом состоянии игра ждёт когда игрок выберет два блока для свапа.
+    /// </summary>
     public class IdleState : GameState
     {
         private readonly Texture2D _frameTexture;
@@ -19,7 +22,7 @@ namespace Horizon3.GameScene
             _turn = turn;
         }
 
-        public override void Update(GameTime gameTime, GameGrid context)
+        public override void Update(GameTime gameTime, GameContext context)
         {
             ManagePlayerInput(context);
         }
@@ -50,7 +53,7 @@ namespace Horizon3.GameScene
             }
         }
 
-        private void ManagePlayerInput(GameGrid context)
+        private void ManagePlayerInput(GameContext context)
         {
             if (GetCellClick() is { } click)
             {

@@ -6,7 +6,6 @@ namespace Horizon3
     public interface IGlobalState
     {
         public void Start() { }
-        public void Stop() { }
         public void Update(GameTime gameTime);
         public void Draw(SpriteBatch spriteBatch);
     }

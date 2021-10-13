@@ -5,83 +5,9 @@ using System.Linq;
 
 namespace Horizon3.GameScene.Model
 {
-    public class BlockData
-    {
-        public int Type { get; set; }
-        public bool Alive { get; set; } = true;
-        /// <summary>
-        /// Флаг которым пемечается последний передвинутый блок, на его месте может возникнуть бонус.
-        /// </summary>
-        public bool Suspect { get; set; }
-        public Bonus Bonus { get; set; }
-    }
-
-    public interface ITurn { }
-
-    public class AnimationTurn : ITurn
-    {
-        public readonly BlockData[,] Blocks;
-        //список бонусов сработавших в этом раунде
-        public readonly List<Bonus> Bonuses;
-        //индексы которые умерли в текущем раунде от матчей, без учёта бонусов
-        public readonly List<Point> Dead;
-        public AnimationTurn(BlockData[,] blocks, List<Bonus> bonuses, List<Point> dead)
-        {
-            Blocks = blocks;
-            Bonuses = bonuses;
-            Dead = dead;
-        }
-    }
-
-    public class DropTurn : ITurn
-    {
-        public readonly BlockData[,] Blocks;
-        //список блоков которые падают в начале текущего раунда
-        public readonly List<Point> Drop;
-        public DropTurn(BlockData[,] blocks, List<Point> drop)
-        {
-            Blocks = blocks;
-            Drop = drop;
-        }
-    }
-
-    public class IdleTurn : ITurn
-    {
-        public readonly BlockData[,] Blocks;
-        public IdleTurn(BlockData[,] blocks)
-        {
-            Blocks = blocks;
-        }
-    }
-
-    public class SwapTurn : ITurn
-    {
-        public readonly BlockData[,] Blocks;
-        public readonly Point First;
-        public readonly Point Second;
-        public SwapTurn(BlockData[,] blocks, Point first, Point second)
-        {
-            Blocks = blocks;
-            First = first;
-            Second = second;
-        }
-    }
-
-    public class SwapInfo
-    {
-        public readonly Point First;
-        public readonly Point Second;
-
-        public SwapInfo(Point first, Point second)
-        {
-            First = first;
-            Second = second;
-        }
-    }
-
     /// <summary>
-    /// Модель отвечает исполнение правил игры. Игра представлена поледовательностью ходов(раундов)
-    /// разного вида, генерируемых моделью.
+    /// Пассивная модель. Модель отвечает исполнение правил игры. Игра представлена 
+    /// поледовательностью ходов(раундов) разного типа, генерируемых моделью.
     /// </summary>
     public class GameModel
     {
@@ -93,7 +19,6 @@ namespace Horizon3.GameScene.Model
 
         private readonly BlockData[,] _blocks = new BlockData[GridSize, GridSize];
         private readonly IEnumerator<ITurn> _enumerator;
-
         private SwapInfo _swap;
 
         public GameModel()
@@ -135,24 +60,31 @@ namespace Horizon3.GameScene.Model
                 var matches = FindMatches();
                 if (matches.Count > 0)
                 {
-                    var bonuses = CollectBonuses(matches);
-                    Score += ExecuteMatches(matches);
-                    var dead = CollectDead();
-                    Score += ExecuteBonuses(bonuses);
-                    yield return new AnimationTurn(_blocks, bonuses, dead);
-                    while (!IsAllBlocksAlive())
+                    while (matches.Count > 0)
                     {
+                        var bonuses = CollectBonuses(matches);
+                        Score += ExecuteMatches(matches);
+                        var dead = CollectDead();
+                        Score += ExecuteBonuses(bonuses);
+                        yield return new AnimationTurn(_blocks, bonuses, dead);
+                        CreateBlocksInFirstRow();
                         var drop = MakeDropList();
-                        yield return new DropTurn(_blocks, drop);
-                        DropBlocks(drop);
+                        while (drop.Count > 0)
+                        {
+                            yield return new DropTurn(_blocks, drop);
+                            DropBlocks(drop);
+                            CreateBlocksInFirstRow();
+                            drop = MakeDropList();
+                        }
+                        matches = FindMatches();
                     }
                 }
                 else if (_swap is { })
                 {
                     ReturnSwapedBlocks();
                     yield return new SwapTurn(_blocks, _swap.Second, _swap.First);
-                    _swap = null;
                 }
+                _swap = null;
                 ReleaseSuspects();
 
                 while (_swap is null) yield return new IdleTurn(_blocks);
@@ -176,7 +108,6 @@ namespace Horizon3.GameScene.Model
             var block2 = _blocks.GetValue(_swap.Second);
             _blocks.SetValue(_swap.First, block2);
             _blocks.SetValue(_swap.Second, block1);
-
         }
 
         private void ReleaseSuspects()
@@ -223,7 +154,7 @@ namespace Horizon3.GameScene.Model
             }
         }
 
-        private List<Bonus> CollectBonuses(List<MatchChain> matches)
+        private List<BonusLogic> CollectBonuses(List<MatchChain> matches)
         {
             return matches
                 .SelectMany(chain => chain.Blocks)
@@ -253,7 +184,7 @@ namespace Horizon3.GameScene.Model
         }
 
         ///<returns>Очки за исполнение бонусов, учитываются только живые блоки</returns>
-        private int ExecuteBonuses(List<Bonus> list)
+        private int ExecuteBonuses(List<BonusLogic> list)
            => list.Select(bonus => bonus.Execute(_blocks)).Sum();
 
         private List<Point> MakeDropList()
@@ -261,7 +192,7 @@ namespace Horizon3.GameScene.Model
             var list = new List<Point>();
             for (int x = 0; x < GridSize; x++)
             {
-                for (int y = 0; y < GridSize; y++)
+                for (int y = 1; y < GridSize; y++)
                 {
                     if (!_blocks[x, y].Alive)
                     {
@@ -280,12 +211,18 @@ namespace Horizon3.GameScene.Model
             {
                 var (x, y) = point;
                 _blocks[x, y + 1] = _blocks[x, y];
+                _blocks[x, y] = null;
             });
-            list
-                .Select(point => point.X)
-                .Distinct()
-                .ToList()
-                .ForEach(x => _blocks[x, 0] = CreateBlock());
+        }
+
+        private void CreateBlocksInFirstRow()
+        {
+            for (int x = 0; x < GridSize; x++)
+            {
+                var block = _blocks[x, 0];
+                if (block == null || block.Alive == false)
+                    _blocks[x, 0] = CreateBlock();
+            }
         }
     }
 }

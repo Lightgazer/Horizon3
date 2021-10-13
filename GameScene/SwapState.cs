@@ -6,24 +6,27 @@ using System;
 
 namespace Horizon3.GameScene
 {
+    /// <summary>
+    /// В этом состоянии игра показывает анимацию где два блока меняются местами.
+    /// </summary>
     public class SwapState : GameState
     {
         private readonly Vector2 _direction;
         private readonly SwapTurn _turn;
-        private float _displacement = 0;
+        private float _displacement = -BlockSize;
 
         public SwapState(SwapTurn turn, ContentManager content) : base(content)
         {
             _turn = turn;
-            _direction = (turn.Second - turn.First).ToVector2();
+            _direction = (turn.First - turn.Second).ToVector2();
         }
 
-        public override void Update(GameTime gameTime, GameGrid context)
+        public override void Update(GameTime gameTime, GameContext context)
         {
-            const float target = BlockSize;
+            const float target = 0;
             var delta = (float)gameTime.ElapsedGameTime.TotalSeconds * BlockSize * 2 *
                             GameSettings.AnimationSpeed;
-            _displacement += MyMath.MoveTowards(_displacement, target, delta);
+            _displacement = MyMath.MoveTowards(_displacement, target, delta);
             if (Math.Abs(_displacement - target) < float.Epsilon) context.NextTurn();
         }
 
@@ -39,6 +42,7 @@ namespace Horizon3.GameScene
                 var texture = BlockTextures[block.Type];
                 var position = index.ToVector2() * BlockSize + Padding;
                 if (_turn.First == index) position += _direction * _displacement;
+                if (_turn.Second == index) position += -_direction * _displacement;
                 spriteBatch.Draw(texture, position, Color.White);
                 DrawBonusIcon(spriteBatch, block, position);
             });

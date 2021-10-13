@@ -21,7 +21,7 @@ namespace Horizon3.GameScene.Model
             int score = Blocks.Where(block => block.Alive).Count();
             Blocks.ForEach(block =>
             {
-                Bonus bonus = null;
+                BonusLogic bonus = null;
                 if (!block.Alive)
                 {
                     bonus = new BombBonus();
