@@ -4,20 +4,21 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Horizon3
 {
-    public abstract class Label
+    public class Label
     {
-        protected string Text = "";
-        protected Vector2 Position;
+        public string Text { private get; set; } = "";
+        protected Vector2 _position;
         private readonly SpriteFont _font;
 
-        protected Label(ContentManager content)
+        public Label(ContentManager content, Vector2 position)
         {
             _font = content.Load<SpriteFont>("Font");
+            _position = position;
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.DrawString(_font, Text, Position, Color.White);
+            spriteBatch.DrawString(_font, Text, _position, Color.White);
         }
     }
 }

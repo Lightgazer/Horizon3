@@ -46,17 +46,18 @@ namespace Horizon3.GameScene
                 rotation = 1.57f;
 
             if (texture is { })
-                spriteBatch.Draw(texture, position + Origin, null, Color.White, rotation, Origin, 
+            {
+                spriteBatch.Draw(texture, position + Origin, null, Color.White, rotation, Origin,
                     1, SpriteEffects.None, 0f);
+            }
         }
 
         private static Texture2D[] LoadBlockTextures(ContentManager content)
         {
             var textures = new Texture2D[GameModel.NumberOfBlockTypes];
             for (var index = 0; index < GameModel.NumberOfBlockTypes; index++)
-            {
                 textures[index] = content.Load<Texture2D>("blocks/block" + index.ToString());
-            }
+
             return textures;
         }
     }

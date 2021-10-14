@@ -17,27 +17,18 @@ namespace Horizon3
 
         public static void ChangeState<T>() where T : IGlobalState
         {
-            var index = Scenes.FindIndex(scene => scene is T);
-            ChangeState(index);
-        }
-
-        public static void ChangeState(int index)
-        {
-            if (Scenes.ElementAtOrDefault(index) is { } scene)
-            {
-                _currentScene = scene;
-                _currentScene.Start();
-            }
+            _currentScene = Scenes.Find(scene => scene is T);
+            _currentScene.Start();
         }
 
         public static void Update(GameTime gameTime)
         {
-            _currentScene?.Update(gameTime);
+            _currentScene.Update(gameTime);
         }
 
         public static void Draw(SpriteBatch spriteBatch)
         {
-            _currentScene?.Draw(spriteBatch);
+            _currentScene.Draw(spriteBatch);
         }
     }
 }

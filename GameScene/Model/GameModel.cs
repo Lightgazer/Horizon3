@@ -53,6 +53,15 @@ namespace Horizon3.GameScene.Model
             return false;
         }
 
+        private static bool IsSwapAllowed(Point first, Point second)
+        {
+            if (first.X == second.X)
+                return Math.Abs(first.Y - second.Y) == 1;
+            if (first.Y == second.Y)
+                return Math.Abs(first.X - second.X) == 1;
+            return false;
+        }
+
         private IEnumerable<ITurn> TurnIterator()
         {
             while (true)
@@ -67,6 +76,7 @@ namespace Horizon3.GameScene.Model
                         var dead = CollectDead();
                         Score += ExecuteBonuses(bonuses);
                         yield return new AnimationTurn(_blocks, bonuses, dead);
+                        RestoreBonusBlocks(dead);
                         CreateBlocksInFirstRow();
                         var drop = MakeDropList();
                         while (drop.Count > 0)
@@ -91,15 +101,6 @@ namespace Horizon3.GameScene.Model
 
                 yield return new SwapTurn(_blocks, _swap.First, _swap.Second);
             }
-        }
-
-        private static bool IsSwapAllowed(Point first, Point second)
-        {
-            if (first.X == second.X)
-                return Math.Abs(first.Y - second.Y) == 1;
-            if (first.Y == second.Y)
-                return Math.Abs(first.X - second.X) == 1;
-            return false;
         }
 
         private void ReturnSwapedBlocks()
@@ -134,7 +135,7 @@ namespace Horizon3.GameScene.Model
                 var matchChain = new MatchChain(vertical);
                 for (var j = 0; j < GridSize; j++)
                 {
-                    var (x, y) = vertical ? (j, k) : (k, j);
+                    var (x, y) = vertical ? (k, j) : (j, k);
                     var block = _blocks[x, y];
                     if (block.Bonus is { }) block.Bonus.Target = new Point(x, y);
                     if (currentType == block.Type)
@@ -178,9 +179,19 @@ namespace Horizon3.GameScene.Model
             _blocks.ForEach((block, point) =>
             {
                 if (!block.Alive) list.Add(point);
-                if (block.Bonus is { }) block.Alive = true;     //воскрешаем блоки получившие бонус
             });
             return list;
+        }
+
+        /// <summary>
+        /// Из списка попавших в матч восстонавливает тех кто получил бонус.
+        /// </summary>
+        private void RestoreBonusBlocks(List<Point> dead)
+        {
+            dead.ForEach(index => {
+                var block = _blocks.GetValue(index);
+                if (block.Bonus is { }) block.Alive = true;
+            });
         }
 
         ///<returns>Очки за исполнение бонусов, учитываются только живые блоки</returns>

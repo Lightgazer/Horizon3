@@ -11,10 +11,11 @@ namespace Horizon3.GameScene.Model
         public readonly List<Point> Dead = new List<Point>();
         public readonly List<BonusLogic> Childs = new List<BonusLogic>();
 
-        private int _score = 0;
+        private int _score;
 
         public int Execute(BlockData[,] blocks)
         {
+            _score = 0;
             FindTarget(target => OnEachTarget(target, blocks));
 
             _score += Childs.Select(bonus => bonus.Execute(blocks)).Sum();

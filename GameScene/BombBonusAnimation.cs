@@ -18,6 +18,7 @@ namespace Horizon3.GameScene
         {
             _childs = bonus.Childs.Select(child => Create(child, content)).ToList();
             _data = bonus;
+            Target = bonus.Target;
         }
 
         public override void Update(GameTime gameTime, float[,] shrink)
