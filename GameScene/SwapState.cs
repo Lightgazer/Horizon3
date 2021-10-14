@@ -24,7 +24,7 @@ namespace Horizon3.GameScene
         public override void Update(GameTime gameTime, GameContext context)
         {
             const float target = 0;
-            var delta = (float) gameTime.ElapsedGameTime.TotalSeconds * BlockSize * 2 *
+            var delta = (float)gameTime.ElapsedGameTime.TotalSeconds * BlockSize * 2 *
                         GameSettings.AnimationSpeed;
             _displacement = MyMath.MoveTowards(_displacement, target, delta);
             if (Math.Abs(_displacement - target) < float.Epsilon) context.NextTurn();

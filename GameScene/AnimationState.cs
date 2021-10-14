@@ -1,9 +1,9 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Horizon3.GameScene.Model;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using System.Collections.Generic;
-using Horizon3.GameScene.Model;
+using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Horizon3.GameScene
@@ -33,7 +33,7 @@ namespace Horizon3.GameScene
             _turn.Dead.ForEach(point => _shrinkGrid.SetValue(point, _localShrink));
             _bonuses.ForEach(bonus => bonus.Update(gameTime, _shrinkGrid));
 
-            if (IsOver()) 
+            if (IsOver())
                 context.NextTurn();
         }
 

@@ -188,7 +188,8 @@ namespace Horizon3.GameScene.Model
         /// </summary>
         private void RestoreBonusBlocks(List<Point> dead)
         {
-            dead.ForEach(index => {
+            dead.ForEach(index =>
+            {
                 var block = _blocks.GetValue(index);
                 if (block.Bonus is { }) block.Alive = true;
             });
