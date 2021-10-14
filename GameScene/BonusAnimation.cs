@@ -14,7 +14,7 @@ namespace Horizon3.GameScene
         public Point Target { get; protected set; }
         public bool Over { get; protected set; }
 
-        public static BonusAnimation Create(BonusLogic bonus, ContentManager content)
+        public static BonusAnimation Create(Bonus bonus, ContentManager content)
         {
             return bonus switch
             {
@@ -28,7 +28,7 @@ namespace Horizon3.GameScene
 
         public abstract void Draw(SpriteBatch spriteBatch);
 
-        protected static bool IsOver(BonusLogic bonus, float[,] shrink, List<BonusAnimation> childs)
+        protected static bool IsOver(Bonus bonus, float[,] shrink, List<BonusAnimation> childs)
         {
             return bonus.Dead.All(index => Math.Abs(shrink.GetValue(index) - TargetSizeShrink) < float.Epsilon)
                 && childs.All(child => child.Over);

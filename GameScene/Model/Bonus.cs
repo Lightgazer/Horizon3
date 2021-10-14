@@ -5,11 +5,11 @@ using System.Linq;
 
 namespace Horizon3.GameScene.Model
 {
-    public abstract class BonusLogic
+    public abstract class Bonus
     {
         public Point Target { get; set; }
         public readonly List<Point> Dead = new List<Point>();
-        public readonly List<BonusLogic> Childs = new List<BonusLogic>();
+        public readonly List<Bonus> Childs = new List<Bonus>();
 
         private int _score;
 

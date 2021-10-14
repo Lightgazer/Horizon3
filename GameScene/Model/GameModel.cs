@@ -155,7 +155,7 @@ namespace Horizon3.GameScene.Model
             }
         }
 
-        private List<BonusLogic> CollectBonuses(List<MatchChain> matches)
+        private List<Bonus> CollectBonuses(List<MatchChain> matches)
         {
             return matches
                 .SelectMany(chain => chain.Blocks)
@@ -195,7 +195,7 @@ namespace Horizon3.GameScene.Model
         }
 
         ///<returns>Очки за исполнение бонусов, учитываются только живые блоки</returns>
-        private int ExecuteBonuses(List<BonusLogic> list)
+        private int ExecuteBonuses(List<Bonus> list)
            => list.Select(bonus => bonus.Execute(_blocks)).Sum();
 
         private List<Point> MakeDropList()

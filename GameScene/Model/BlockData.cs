@@ -4,7 +4,7 @@
     {
         int Type { get; }
         bool Alive { get; }
-        BonusLogic Bonus { get; }
+        Bonus Bonus { get; }
     }
 
     public class BlockData : IReadOnlyBlock
@@ -15,6 +15,6 @@
         /// Флаг которым пемечается последний передвинутый блок, на его месте может возникнуть бонус.
         /// </summary>
         public bool Suspect { get; set; }
-        public BonusLogic Bonus { get; set; }
+        public Bonus Bonus { get; set; }
     }
 }

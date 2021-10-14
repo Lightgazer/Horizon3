@@ -9,10 +9,10 @@ namespace Horizon3.GameScene.Model
     {
         public readonly ReadOnlyBlocks Blocks;
         /// <summary> Список бонусов сработавших в этом раунде. </summary>
-        public readonly List<BonusLogic> Bonuses;
+        public readonly List<Bonus> Bonuses;
         /// <summary> Индексы которые умерли в текущем раунде от матчей, без учёта бонусов. </summary>
         public readonly List<Point> Dead;
-        public AnimationTurn(BlockData[,] blocks, List<BonusLogic> bonuses, List<Point> dead)
+        public AnimationTurn(BlockData[,] blocks, List<Bonus> bonuses, List<Point> dead)
         {
             Blocks = new ReadOnlyBlocks(blocks);
             Bonuses = bonuses;
