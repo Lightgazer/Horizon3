@@ -7,14 +7,14 @@ namespace Horizon3.GameScene.Model
 
     public class AnimationTurn : ITurn
     {
-        public readonly BlockData[,] Blocks;
+        public readonly ReadOnlyBlocks Blocks;
         /// <summary> Список бонусов сработавших в этом раунде. </summary>
         public readonly List<BonusLogic> Bonuses;
         /// <summary> Индексы которые умерли в текущем раунде от матчей, без учёта бонусов. </summary>
         public readonly List<Point> Dead;
         public AnimationTurn(BlockData[,] blocks, List<BonusLogic> bonuses, List<Point> dead)
         {
-            Blocks = blocks;
+            Blocks = new ReadOnlyBlocks(blocks);
             Bonuses = bonuses;
             Dead = dead;
         }
@@ -22,56 +22,33 @@ namespace Horizon3.GameScene.Model
 
     public class DropTurn : ITurn
     {
-        public readonly BlockData[,] Blocks;
+        public readonly ReadOnlyBlocks Blocks;
         /// <summary> Список блоков которые падают в текущем раунде. </summary>
         public readonly List<Point> Drop;
         public DropTurn(BlockData[,] blocks, List<Point> drop)
         {
-            Blocks = blocks;
+            Blocks = new ReadOnlyBlocks(blocks);
             Drop = drop;
         }
     }
 
     public class IdleTurn : ITurn
     {
-        public readonly BlockData[,] Blocks;
+        public readonly ReadOnlyBlocks Blocks;
         public IdleTurn(BlockData[,] blocks)
         {
-            Blocks = blocks;
+            Blocks = new ReadOnlyBlocks(blocks);
         }
     }
 
     public class SwapTurn : ITurn
     {
-        public readonly BlockData[,] Blocks;
+        public readonly ReadOnlyBlocks Blocks;
         public readonly Point First;
         public readonly Point Second;
         public SwapTurn(BlockData[,] blocks, Point first, Point second)
         {
-            Blocks = blocks;
-            First = first;
-            Second = second;
-        }
-    }
-
-    public class BlockData
-    {
-        public int Type { get; set; }
-        public bool Alive { get; set; } = true;
-        /// <summary>
-        /// Флаг которым пемечается последний передвинутый блок, на его месте может возникнуть бонус.
-        /// </summary>
-        public bool Suspect { get; set; }
-        public BonusLogic Bonus { get; set; }
-    }
-
-    public class SwapInfo
-    {
-        public readonly Point First;
-        public readonly Point Second;
-
-        public SwapInfo(Point first, Point second)
-        {
+            Blocks = new ReadOnlyBlocks(blocks);
             First = first;
             Second = second;
         }

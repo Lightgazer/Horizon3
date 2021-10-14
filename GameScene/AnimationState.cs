@@ -16,14 +16,13 @@ namespace Horizon3.GameScene
     {
         public const float TargetSizeShrink = 0.8f;
         private readonly AnimationTurn _turn;
-        private readonly float[,] _shrinkGrid;
+        private readonly float[,] _shrinkGrid = new float[GameModel.GridSize, GameModel.GridSize];
         private readonly List<BonusAnimation> _bonuses;
         private float _localShrink = 0;
 
         public AnimationState(AnimationTurn turn, ContentManager content) : base(content)
         {
             _turn = turn;
-            _shrinkGrid = new float[turn.Blocks.Length, turn.Blocks.Length];
             _bonuses = turn.Bonuses.Select(b => BonusAnimation.Create(b, content)).ToList();
         }
 

@@ -28,7 +28,7 @@ namespace Horizon3.GameScene.Model
             if (CheckTarget(target, blocks))
             {
                 _score++;
-                var block = blocks[target.X, target.Y];
+                var block = blocks.GetValue(target);
                 block.Alive = false;
                 Dead.Add(target);
                 if (block.Bonus is { }) Childs.Add(block.Bonus);

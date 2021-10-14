@@ -32,7 +32,7 @@ namespace Horizon3.GameScene
 
         public abstract void Draw(SpriteBatch spriteBatch);
 
-        protected void DrawBonusIcon(SpriteBatch spriteBatch, BlockData block, Vector2 position)
+        protected void DrawBonusIcon(SpriteBatch spriteBatch, IReadOnlyBlock block, Vector2 position)
         {
             var texture = block.Bonus switch
             {
