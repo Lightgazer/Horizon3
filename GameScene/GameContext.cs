@@ -20,9 +20,9 @@ namespace Horizon3.GameScene
         private GameState _state;
 
 
-        public GameContext(ContentManager content, GameModel model)
+        public GameContext(ContentManager content)
         {
-            Model = model;
+            Model = new GameModel();
             _content = content;
             NextTurn();
         }

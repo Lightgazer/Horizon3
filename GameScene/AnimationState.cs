@@ -50,7 +50,7 @@ namespace Horizon3.GameScene
                 var texture = BlockTextures[block.Type];
                 var position = index.ToVector2() * BlockSize + Padding;
                 var size = 1 - _shrinkGrid.GetValue(index);
-                spriteBatch.Draw(texture, position + Origin, null, Color.White, 0f, Origin, size, SpriteEffects.None, 0f);
+                spriteBatch.Draw(texture, position + BlockOrigin, null, Color.White, 0f, BlockOrigin, size, SpriteEffects.None, 0f);
                 DrawBonusIcon(spriteBatch, block, position);
             });
         }

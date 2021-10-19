@@ -12,7 +12,7 @@ namespace Horizon3.GameScene
         private const int SideLength = GameModel.GridSize * BlockSize;
 
         public static Vector2 Padding = new Point((GameSettings.Width - SideLength) / 2, (GameSettings.Height - SideLength) / 2).ToVector2();
-        public static Vector2 Origin = new Vector2(BlockSize / 2);
+        public static Vector2 BlockOrigin = new Vector2(BlockSize / 2);
 
         protected readonly Texture2D[] BlockTextures;
         protected readonly Rectangle GridRectangle;
@@ -47,7 +47,7 @@ namespace Horizon3.GameScene
 
             if (texture is { })
             {
-                spriteBatch.Draw(texture, position + Origin, null, Color.White, rotation, Origin,
+                spriteBatch.Draw(texture, position + BlockOrigin, null, Color.White, rotation, BlockOrigin,
                     1, SpriteEffects.None, 0f);
             }
         }
