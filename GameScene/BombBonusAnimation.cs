@@ -36,7 +36,10 @@ namespace Horizon3.GameScene
             }
         }
 
-        public override void Draw(SpriteBatch spriteBatch) { }
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            _childs.ForEach(bonus => bonus.Draw(spriteBatch));
+        }
 
         private void ShrinkBlocks(GameTime gameTime, float[,] shrink)
         {
