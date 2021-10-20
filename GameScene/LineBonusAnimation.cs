@@ -61,8 +61,8 @@ namespace Horizon3.GameScene
             var blockIndex = Target + position;
             var screenPosition = blockIndex.ToVector2() * BlockSize + GameState.Padding;
             screenPosition += _data.Vertical ? new Vector2(0, displacement) : new Vector2(displacement, 0);
-            spriteBatch.Draw(_texture, screenPosition + GameState.Origin, null, Color.White, rotation,
-                GameState.Origin, 1, SpriteEffects.None, 0f);
+            spriteBatch.Draw(_texture, screenPosition + GameState.BlockOrigin, null, Color.White, rotation,
+                GameState.BlockOrigin, 1, SpriteEffects.None, 0f);
         }
 
         private bool MoveDestructor(GameTime gameTime)

@@ -1,5 +1,4 @@
 ﻿using Horizon3.GameScene;
-using Horizon3.GameScene.Model;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -21,8 +20,7 @@ namespace Horizon3
 
         public void Start()
         {
-            var model = new GameModel();
-            _grid = new GameContext(_content, model);
+            _grid = new GameContext(_content);
             _scoreWidget = new ScoreWidget(_content);
             _timer = new GameTimer(_content, 60d);
         }

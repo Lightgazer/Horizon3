@@ -8,13 +8,15 @@ namespace Horizon3.GameScene.Model
     public abstract class Bonus
     {
         public Point Target { get; set; }
-        public readonly List<Point> Dead = new List<Point>();
-        public readonly List<Bonus> Childs = new List<Bonus>();
+        public List<Point> Dead;
+        public List<Bonus> Childs;
 
         private int _score;
 
         public int Execute(BlockData[,] blocks)
         {
+            Dead = new List<Point>();
+            Childs = new List<Bonus>();
             _score = 0;
             FindTarget(target => OnEachTarget(target, blocks));
 
